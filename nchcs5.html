@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <title>Mapping with D3</title>
+        
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="ca.json"></script>
+    </head>
+<body>
+    <h1>NCHCS ASCS</h1>
+    <h2>
+
+    </h2>
+    <script>
+
+    d3.csv("data/ascs.csv" , function(err,data){
+        console.log(data[1])
+    
+       var width = 1800;
+         var height = 2000;
+
+         var svg = d3.select('body')
+            .append('svg')
+            .attr('width',"100%")
+            .attr('height',height)
+        .call(d3.zoom().on("zoom", function () {
+    svg.attr("transform", d3.event.transform)
+ }))
+ .append("g")
+           
+        var projection = d3.geoMercator()
+        .scale( 15500 )
+        .center( [0, 39.50] )
+        .rotate( [122.80,0] )
+        .translate( [width/3.0,height/2.0] )
+            
+           var geoGenerator = d3.geoPath().projection(projection)
+
+        var g = svg.append('g')
+        
+        g.selectAll('path')
+        .data(ca.features)
+        .enter()
+        .append('path')
+        .attr( "fill", "#FFF" )
+        .attr( "stroke", "#000")
+        .attr('d',geoGenerator)
+
+         var dots = svg.selectAll('circle')  
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr("fill","#00F")
+        .attr("r",0.5)
+        .attr("cx" , function(d) { 
+           return projection([d.LON,d.LAT])[0]
+        })
+        .attr("cy", function(d){
+            return projection([d.LON,d.LAT])[1]
+        })
+        .on("mouseover", function(d){
+            d3.select("h2").text([d.Patient_SSN,d.Patient_Name,d.cMort_1y,d.cMort_90d]);
+            d3.select(this)
+        })
+        .on("mouseout", function(d){
+		d3.select("h2").text("@");
+		d3.select(this)
+	});
+    })
+        
+        </script>
+</body>
+
+
+</html>
