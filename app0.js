@@ -35,11 +35,11 @@ app.get('/',function(res,req){
         res.end()
     }, function(err) {
         console.log('fetch error',err)
-        res.write(500,'internal error')
+        res.write('internal error')
         res.end()
     }).catch (function(error){
         console.log('really bad:', error)
-        res.write(500,error.message)
+        res.write('error.message')
         res.end()
     })
     //res.setEncoding(a)
