@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body>
+    <div ng-app = "nchcsMAP" ng-controller = "MapController">
+        <p>Hello World</p>
+        <p>{{main.message}}</p>
+        <p>{{main.data}}</p>
+    </div>
+<script>
+var app = angular.module('nchcsMAP',[]);
+app.controller('MapController', function($scope){
+    $scope.main = {}
+    $scope.main.message = "Hello NCHCS" 
+    $scope.main.data = ''
+   /* $http.get('/data').then(function(data){
+        $scope.main.data=data
+        console.log
+    })
+    */
+})
+
+</script>
+</body>
+</html>
