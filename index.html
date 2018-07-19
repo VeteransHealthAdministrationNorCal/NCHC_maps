@@ -4,28 +4,94 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <!--<link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <title>Mapping with D3</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="ca.js"></script>
 </head>
 <body>
     <div ng-app = "nchcsMAP" ng-controller = "MapController">
-        <p>Hello World</p>
-        <p>{{main.message}}</p>
-        <p>{{main.data}}</p>
+        
+      <p>{{main.message}}</p>
+    <h2></h2>
+       
+    
     </div>
 <script>
 var app = angular.module('nchcsMAP',[]);
-app.controller('MapController', function($scope){
+app.controller('MapController', function($scope, $http){
     $scope.main = {}
-    $scope.main.message = "Hello NCHCS" 
+    $scope.main.message = "VA NCHCS CAN projection" 
+    
+   
     $scope.main.data = ''
-   /* $http.get('/data').then(function(data){
-        $scope.main.data=data
-        console.log
-    })
-    */
+    $http.get('/GetData').then(function(data){
+       
+        $scope.main.data=data.data
+        console.log($scope.main.data); // returning an array of objects.
+        var width = 1800;
+        var height = 1800;
+        var projection = d3.geoMercator()
+        .scale( 15500 )
+        .center( [0, 39.50] )
+        .rotate( [122.80,0] )
+        .translate( [width/3.0,height/2.0] )
+            
+        var geoGenerator = d3.geoPath().projection(projection)
+        var svg = d3.select('body')
+            .append('svg')
+            .attr('width',"100%")
+            .attr('height',height)
+            
+        .call(d3.zoom().on("zoom", function () {
+    svg.attr("transform", d3.event.transform)
+ })).append("g")
+
+        var g = svg.append('g')
+        
+        g.selectAll('path')
+        .data(ca.features)
+        .enter()
+        .append('path')
+        .attr( "fill", "#FFF" )
+        .attr( "stroke", "#000")
+        .attr('d',geoGenerator)
+
+        dot = svg.selectAll('circle')
+        //.data([{"r":10,"LON":-121.4994,"LAT":38.5816, "fill":"red"}])
+        .data($scope.main.data)
+        .enter()
+        .append('circle')
+
+        .attr("fill", function(d){
+          return "blue"
+        })
+        .attr("cx",function(d) {
+            return projection([d.LON,d.LAT])[0]
+        })
+        .attr("cy",function(d){
+            return projection([d.LON,d.LAT])[1]
+        })
+        .attr("r", function(d){
+            return 0.5
+        })
+        .on("mouseover", function(d){
+            d3.select("h2").text([d.Patient_SSN,d.Patient_Name,d.cMort_1y,d.cMort_90d]);
+            d3.select(this)
+        })
+        .on("mouseout", function(d){
+		d3.select("h2").text("@");
+		d3.select(this)
+    });
+      
+
+
+  })
+    
+
+    
 })
 
 </script>
